@@ -15,7 +15,7 @@ type Cat struct {
 	Url string `json:"url"`
 }
 
-func getCat() []byte {
+func getCats() []byte {
 	catApiUrl := "https://api.thecatapi.com/v1/images/search?size=full"
 	apiKey := os.Getenv("API_KEY")
 	u, _ := url.Parse(catApiUrl)
@@ -23,7 +23,7 @@ func getCat() []byte {
 	q.Add("size", "full")
 	q.Add("mime_types", "jpg")
 	u.RawQuery = q.Encode()
-	fmt.Println("Fetching random cat from url:", u.String())
+	fmt.Println("Fetching random cat data from TheCatsApi...")
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		panic(err.Error())
@@ -41,13 +41,21 @@ func getCat() []byte {
 	return body
 }
 
-func parseCat(body []byte) (*[]Cat, error) {
+func parseCats(body []byte) *[]Cat {
 	var cats = new([]Cat)
 	err := json.Unmarshal(body, &cats)
 	if err != nil {
 		fmt.Println("whoops:", err)
 	}
-	return cats, err
+	return cats
+}
+
+func getImgUrl(cats *[]Cat) string {
+	catSlice := *cats
+	cat := catSlice[0]
+	catUrl := cat.Url
+	fmt.Println("Got cat img url:", catUrl)
+	return catUrl
 }
 
 func saveImg(srcUrl string, filePath string) {
@@ -74,5 +82,5 @@ func saveImg(srcUrl string, filePath string) {
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Println("Image downloaded!")
+	fmt.Println("Cat saved!")
 }

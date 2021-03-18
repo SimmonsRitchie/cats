@@ -1,4 +1,4 @@
-module github.com/SimmonsRitchie/fetchCat
+module github.com/SimmonsRitchie/cats
 
 go 1.16
 
