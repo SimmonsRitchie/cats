@@ -10,6 +10,8 @@ Then, to install the binary to your current directory, run the following command
 
 ## Usage
 
+Options:
+
 ```
   -o string
         output path for cat image (default "./cat.jpg")
