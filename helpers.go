@@ -17,18 +17,25 @@ type Cat struct {
 
 func getCats() []byte {
 	catApiUrl := "https://api.thecatapi.com/v1/images/search?size=full"
-	apiKey := os.Getenv("API_KEY")
+
+	// build request
 	u, _ := url.Parse(catApiUrl)
 	q, _ := url.ParseQuery(u.RawQuery)
 	q.Add("size", "full")
 	q.Add("mime_types", "jpg")
 	u.RawQuery = q.Encode()
-	fmt.Println("Fetching random cat data from TheCatsApi...")
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		panic(err.Error())
 	}
-	req.Header.Set("api_key", apiKey)
+	apiKey := os.Getenv("API_KEY")
+	if apiKey != "" {
+		fmt.Println("Using API_KEY...")
+		req.Header.Set("api_key", apiKey)
+	}
+
+	// fetch
+	fmt.Println("Fetching random cat data from TheCatsApi...")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {

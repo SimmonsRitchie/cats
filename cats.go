@@ -1,15 +1,16 @@
 package main
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/joho/godotenv"
 )
 
 func init() {
-	// loads values from .env into the system
-	if err := godotenv.Load(); err != nil {
-		log.Print("No .env file found")
+	// loads values from .env into the system if .env is detected
+	err := godotenv.Load()
+	if err == nil {
+		fmt.Println("Loading .env file")
 	}
 }
 
