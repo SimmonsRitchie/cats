@@ -1,10 +1,10 @@
 # cats
-Tool that downloads a random cat image from [The Cat API](https://thecatapi.com/), implemented in Go.
+A tool implemented in Go that downloads a random cat image from [The Cat API](https://thecatapi.com/).
 
 ## Installation
-Install [Go](https://golang.org/doc/install)
+First install [Go](https://golang.org/doc/install).
 
-To install the binary to your current directory:
+Then, to install the binary to your current directory, run the following command:
 
 `GOBIN="$(pwd)" GOPATH="$(mktemp -d)" go get github.com/simmonsritchie/cats`
 
@@ -14,13 +14,13 @@ In the directory you installed the binary, run:
 
 `./cats`
 
-## Examples
+## Example cats
 
-Random cat:
+![screenshot](./example1.jpg)
 
-![screenshot](./example.jpg)
+![screenshot](./example2.jpg)
 
-## Using an API key
+## API key
 
 By default, cats fetches data from [The Cat API](https://thecatapi.com/) without an API key. The Cat API allows requesters to make requests without one.
 
