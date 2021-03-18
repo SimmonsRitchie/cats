@@ -8,7 +8,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var outputPath = flag.String("o", "./cat.jpg", "Output path for cat image")
+var outputPath = flag.String("o", "./cat.jpg", "output path for cat image")
+var verboseMode = flag.Bool("v", false, "log messages to stdout")
 
 func init() {
 	// get flags
@@ -21,11 +22,12 @@ func init() {
 	// loads values from .env into the system if .env is detected
 	err := godotenv.Load()
 	if err == nil {
-		fmt.Println("Loading .env file")
+		printMsg("Loading .env file")
 	}
 }
 
 func main() {
+
 	catsJson := getCats()
 	cats := parseCats(catsJson)
 	catUrl := getImgUrl(cats)

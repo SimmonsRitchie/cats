@@ -30,12 +30,12 @@ func getCats() []byte {
 	}
 	apiKey := os.Getenv("API_KEY")
 	if apiKey != "" {
-		fmt.Println("Using API_KEY...")
+		printMsg("Using API_KEY...")
 		req.Header.Set("api_key", apiKey)
 	}
 
 	// fetch
-	fmt.Println("Fetching random cat data from TheCatsApi...")
+	printMsg("Fetching random cat data from TheCatsApi...")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -61,7 +61,7 @@ func getImgUrl(cats *[]Cat) string {
 	catSlice := *cats
 	cat := catSlice[0]
 	catUrl := cat.Url
-	fmt.Println("Got cat img url:", catUrl)
+	printMsg("Got cat img url: " + catUrl)
 	return catUrl
 }
 
@@ -89,5 +89,11 @@ func saveImg(srcUrl string, filePath string) {
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Println("Cat saved to:", filePath)
+	printMsg("Cat saved to: " + filePath)
+}
+
+func printMsg(msg string) {
+	if *verboseMode {
+		fmt.Println(msg)
+	}
 }

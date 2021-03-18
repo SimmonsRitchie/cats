@@ -1,5 +1,5 @@
 # cats
-A tool implemented in Go that downloads a random cat image from [The Cat API](https://thecatapi.com/).
+CLI tool that downloads a random cat image from [The Cat API](https://thecatapi.com/), implemented in Go.
 
 ## Installation
 First install [Go](https://golang.org/doc/install).
@@ -18,7 +18,8 @@ Options:
 
 ```
   -o string
-        Output path for cat image (default "./cat.jpg")
+        output path for cat image (default "./cat.jpg")
+  -v    log messages to stdout
 ```
 
 ## Example cats
