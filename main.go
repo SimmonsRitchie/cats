@@ -16,8 +16,8 @@ func init() {
 }
 
 func main() {
-	catBody := getCatBody()
-	catsPointer, err := parseBody(catBody)
+	catBody := getCat()
+	catsPointer, err := parseCat(catBody)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -25,5 +25,5 @@ func main() {
 	cat := catSlice[0]
 	catUrl := cat.Url
 	fmt.Println("Cat url: ", catUrl)
-	downloadCat(catUrl, "./cat.jpg")
+	saveImg(catUrl, "./cat.jpg")
 }

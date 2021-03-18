@@ -15,7 +15,7 @@ type Cat struct {
 	Url string `json:"url"`
 }
 
-func getCatBody() []byte {
+func getCat() []byte {
 	catApiUrl := "https://api.thecatapi.com/v1/images/search?size=full"
 	apiKey := os.Getenv("API_KEY")
 	u, _ := url.Parse(catApiUrl)
@@ -38,11 +38,10 @@ func getCatBody() []byte {
 	if err != nil {
 		panic(err.Error())
 	}
-	// fmt.Println("Get body, as string:", string(body))
 	return body
 }
 
-func parseBody(body []byte) (*[]Cat, error) {
+func parseCat(body []byte) (*[]Cat, error) {
 	var cats = new([]Cat)
 	err := json.Unmarshal(body, &cats)
 	if err != nil {
@@ -51,7 +50,7 @@ func parseBody(body []byte) (*[]Cat, error) {
 	return cats, err
 }
 
-func downloadCat(srcUrl string, filePath string) {
+func saveImg(srcUrl string, filePath string) {
 	req, err := http.NewRequest("GET", srcUrl, nil)
 	if err != nil {
 		panic(err.Error())
