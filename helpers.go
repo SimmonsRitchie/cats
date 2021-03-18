@@ -89,5 +89,5 @@ func saveImg(srcUrl string, filePath string) {
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Println("Cat saved!")
+	fmt.Println("Cat saved to:", filePath)
 }

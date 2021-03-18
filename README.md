@@ -14,6 +14,13 @@ In the directory you installed the binary, run:
 
 `./cats`
 
+Options:
+
+```
+  -o string
+        Output path for cat image (default "./cat.jpg")
+```
+
 ## Example cats
 
 ![screenshot](./example1.jpg)
