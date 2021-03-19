@@ -15,6 +15,11 @@ type Cat struct {
 	Url string `json:"url"`
 }
 
+type Breed struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
 func getCats() []byte {
 	catApiUrl := "https://api.thecatapi.com/v1/images/search?size=full"
 
@@ -46,6 +51,21 @@ func getCats() []byte {
 		panic(err.Error())
 	}
 	return body
+}
+
+func getBreeds() *[]Breed {
+	catApiUrl := "https://api.thecatapi.com/v1/breeds"
+	resp, err := http.Get(catApiUrl)
+	if err != nil {
+		panic(err.Error())
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	var breeds = new([]Breed)
+	err = json.Unmarshal(body, &breeds)
+	if err != nil {
+		fmt.Println("whoops:", err)
+	}
+	return breeds
 }
 
 func parseCats(body []byte) *[]Cat {
