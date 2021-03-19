@@ -114,10 +114,7 @@ func validateBreed(breed string) {
 
 // FILE I/O
 func saveImg(srcUrl string, filePath string) {
-	req, err := http.NewRequest("GET", srcUrl, nil)
-	die(err)
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := http.Get(srcUrl)
 	die(err)
 	defer resp.Body.Close()
 
