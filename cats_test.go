@@ -19,3 +19,11 @@ func TestParseCats(t *testing.T) {
 		t.Fatalf(`img url = %q, want match for %#q`, catUrl, want)
 	}
 }
+
+func TestGetBreeds(t *testing.T) {
+	breeds := getBreeds()
+	fmt.Println(*breeds)
+	if len(*breeds) < 50 {
+		t.Fatalf(`getBreeds should return at least 50 breeds, not %v`, len(*breeds))
+	}
+}
