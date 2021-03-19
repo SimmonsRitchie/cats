@@ -28,8 +28,7 @@ func getCats() []byte {
 	// build URL
 	u, err := url.Parse(catApiUrl)
 	die(err)
-	q, err := url.ParseQuery(u.RawQuery)
-	die(err)
+	q := u.Query()
 	q.Add("size", "full")
 	q.Add("mime_types", "jpg")
 	if *filterBreeds != "" {
