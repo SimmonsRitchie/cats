@@ -23,5 +23,7 @@ func TestParseCats(t *testing.T) {
 func TestGetBreeds(t *testing.T) {
 	breeds := getBreeds()
 	fmt.Println(*breeds)
-
+	if len(*breeds) < 50 {
+		t.Fatalf(`getBreeds should return at least 50 breeds, not %v`, len(*breeds))
+	}
 }
