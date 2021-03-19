@@ -64,6 +64,7 @@ func getBreeds() *[]Breed {
 	resp, err := http.Get(catApiUrl)
 	die(err)
 	body, err := ioutil.ReadAll(resp.Body)
+	die(err)
 	var breeds = new([]Breed)
 	err = json.Unmarshal(body, &breeds)
 	if err != nil {
