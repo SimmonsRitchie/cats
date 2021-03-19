@@ -26,18 +26,20 @@ Then, to install the binary to your current directory, run the following command
 
 ## API key
 
-By default, cats fetches data from [The Cat API](https://thecatapi.com/) without an API key. The Cat API allows requesters to make requests without one.
+By default, cats fetches data from [The Cat API](https://thecatapi.com/) without an API key. The Cat API allows requesters to return a small amount of data without using one, which is all that this tool needs.
 
-However, heavy users may encounter rate limiting without use of an API key. To provide one to cats, set it as an environment variable:
+However, heavy users of cats may encounter rate limiting without use of an API key. You can sign up for a key for free on the website of [The Cat API](https://thecatapi.com/). You can then provide it to cats as an environment variable before execution.
 
-`export API_KEY=xxxxxxxx`
+On Mac/linux, run the following, replacing 'xxxx' with your key:
 
-Or set API_KEY in a .env file in the same directory as the cats binary:
+`export API_KEY=xxxx`
+
+Or you can set it in an .env file in the same directory as the binary:
 
 ```
 // .env file
 
-API_KEY=xxxxxxx
+API_KEY=xxxx
 ```
 
 
