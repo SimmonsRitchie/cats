@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -53,7 +52,7 @@ func getCats() []byte {
 	resp, err := client.Do(req)
 	die(err)
 	printMsg("Got cat data")
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	die(err)
 	return body
 }
@@ -64,7 +63,7 @@ func getBreeds() []Breed {
 	resp, err := http.Get(catApiUrl)
 	die(err)
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	die(err)
 	var breeds []Breed
 	err = json.Unmarshal(body, &breeds)
