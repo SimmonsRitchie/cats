@@ -31,7 +31,7 @@ func getCats() []byte {
 	apiKey := os.Getenv("API_KEY")
 	if apiKey != "" {
 		printMsg("Using API_KEY...")
-		req.Header.Set("api_key", apiKey)
+		req.Header.Set("x-api-key", apiKey)
 	}
 
 	// fetch
