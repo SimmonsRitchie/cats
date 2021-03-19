@@ -58,7 +58,7 @@ func getCats() []byte {
 	return body
 }
 
-func getBreeds() *[]Breed {
+func getBreeds() []Breed {
 	printMsg("Getting breeds from The Cat API...")
 	catApiUrl := "https://api.thecatapi.com/v1/breeds"
 	resp, err := http.Get(catApiUrl)
@@ -66,7 +66,7 @@ func getBreeds() *[]Breed {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	die(err)
-	var breeds = new([]Breed)
+	var breeds []Breed
 	err = json.Unmarshal(body, &breeds)
 	if err != nil {
 		fmt.Println("whoops:", err)
@@ -76,9 +76,9 @@ func getBreeds() *[]Breed {
 }
 
 // PARSE
-func parseCats(body []byte) *[]Cat {
+func parseCats(body []byte) []Cat {
 	printMsg("Parsing cat data...")
-	var cats = new([]Cat)
+	var cats []Cat
 	err := json.Unmarshal(body, &cats)
 	if err != nil {
 		fmt.Println("whoops:", err)
@@ -87,9 +87,8 @@ func parseCats(body []byte) *[]Cat {
 	return cats
 }
 
-func getImgUrl(cats *[]Cat) string {
-	catSlice := *cats
-	cat := catSlice[0]
+func getImgUrl(cats []Cat) string {
+	cat := cats[0]
 	catUrl := cat.Url
 	printMsg("Got cat img url: " + catUrl)
 	return catUrl
@@ -102,7 +101,7 @@ func validateBreed(breed string) {
 	}
 	breeds := getBreeds()
 	var breedIds []string
-	for _, b := range *breeds {
+	for _, b := range breeds {
 		breedIds = append(breedIds, b.Id)
 	}
 	_, found := Find(breedIds, breed)
@@ -138,9 +137,9 @@ func printMsg(msg string) {
 	}
 }
 
-func pPrintBreeds(breeds *[]Breed) {
-	for i, b := range *breeds {
-		if i < len(*breeds)-1 {
+func pPrintBreeds(breeds []Breed) {
+	for i, b := range breeds {
+		if i < len(breeds)-1 {
 			fmt.Printf("%v (%v), ", b.Name, b.Id)
 		} else {
 			fmt.Printf("%v (%v)\n", b.Name, b.Id)

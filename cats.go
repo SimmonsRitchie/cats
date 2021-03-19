@@ -24,7 +24,7 @@ func main() {
 	// Breeds help
 	if *helpBreeds {
 		breeds := getBreeds()
-		fmt.Printf("%v available cat breeds:\n\n", len(*breeds))
+		fmt.Printf("%v available cat breeds:\n\n", len(breeds))
 		pPrintBreeds(breeds)
 		return
 	}
