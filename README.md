@@ -18,9 +18,11 @@ Then, to install the binary to your current directory, run the following command
 
 ## Example cats
 
-![screenshot](./example1.jpg)
+![screenshot](./examples/1.jpg)
 
-![screenshot](./example2.jpg)
+![screenshot](./examples/2.jpg)
+
+![screenshot](./examples/3.jpg)
 
 ## API key
 
