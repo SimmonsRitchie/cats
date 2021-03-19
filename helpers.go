@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -25,8 +26,10 @@ func getCats() []byte {
 	catApiUrl := "https://api.thecatapi.com/v1/images/search?size=full"
 
 	// build URL
-	u, _ := url.Parse(catApiUrl)
-	q, _ := url.ParseQuery(u.RawQuery)
+	u, err := url.Parse(catApiUrl)
+	die(err)
+	q, err := url.ParseQuery(u.RawQuery)
+	die(err)
 	q.Add("size", "full")
 	q.Add("mime_types", "jpg")
 	if *filterBreeds != "" {
@@ -38,9 +41,7 @@ func getCats() []byte {
 
 	// build request
 	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		panic(err.Error())
-	}
+	die(err)
 	apiKey := os.Getenv("API_KEY")
 	if apiKey != "" {
 		printMsg("Using API_KEY...")
@@ -51,14 +52,10 @@ func getCats() []byte {
 	printMsg("Fetching cat data from The Cat API...")
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	if err != nil {
-		panic(err.Error())
-	}
+	die(err)
 	printMsg("Got cat data")
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(err.Error())
-	}
+	die(err)
 	return body
 }
 
@@ -66,9 +63,7 @@ func getBreeds() *[]Breed {
 	printMsg("Getting breeds from The Cat API...")
 	catApiUrl := "https://api.thecatapi.com/v1/breeds"
 	resp, err := http.Get(catApiUrl)
-	if err != nil {
-		panic(err.Error())
-	}
+	die(err)
 	body, err := ioutil.ReadAll(resp.Body)
 	var breeds = new([]Breed)
 	err = json.Unmarshal(body, &breeds)
@@ -120,26 +115,18 @@ func validateBreed(breed string) {
 // FILE I/O
 func saveImg(srcUrl string, filePath string) {
 	req, err := http.NewRequest("GET", srcUrl, nil)
-	if err != nil {
-		panic(err.Error())
-	}
+	die(err)
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	if err != nil {
-		panic(err.Error())
-	}
+	die(err)
 	defer resp.Body.Close()
 
 	file, err := os.Create(filePath)
-	if err != nil {
-		panic(err.Error())
-	}
+	die(err)
 	defer file.Close()
 
 	_, err = io.Copy(file, resp.Body)
-	if err != nil {
-		panic(err.Error())
-	}
+	die(err)
 	printMsg("Cat saved to: " + filePath)
 }
 
@@ -172,4 +159,10 @@ func Find(slice []string, val string) (int, bool) {
 		}
 	}
 	return -1, false
+}
+
+func die(err error) {
+	if err != nil {
+		log.Fatalf("unexpected error: %v", err)
+	}
 }
