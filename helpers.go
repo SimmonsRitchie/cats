@@ -63,6 +63,7 @@ func getBreeds() *[]Breed {
 	catApiUrl := "https://api.thecatapi.com/v1/breeds"
 	resp, err := http.Get(catApiUrl)
 	die(err)
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	die(err)
 	var breeds = new([]Breed)
