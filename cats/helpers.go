@@ -2,7 +2,6 @@ package cats
 
 import (
 	"fmt"
-	"log"
 )
 
 // DISPLAY
@@ -29,10 +28,4 @@ func Find(slice []string, val string) (int, bool) {
 		}
 	}
 	return -1, false
-}
-
-func die(err error) {
-	if err != nil {
-		log.Fatalf("unexpected error: %v", err)
-	}
 }

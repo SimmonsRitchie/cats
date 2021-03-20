@@ -2,6 +2,7 @@ package cats
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -36,12 +37,6 @@ func CLI(args []string) int {
 
 func (app *appEnv) fromArgs(args []string) error {
 
-	// loads values from .env into the system if .env is detected
-	err := godotenv.Load()
-	if err == nil {
-		app.printMsg("Loading .env file")
-	}
-
 	// set flags
 	fl := flag.NewFlagSet("cats", flag.ContinueOnError)
 	fl.StringVar(
@@ -58,19 +53,18 @@ func (app *appEnv) fromArgs(args []string) error {
 	)
 	fl.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of cats:\n\n")
-		flag.PrintDefaults()
+		fl.PrintDefaults()
 	}
 	if err := fl.Parse(args); err != nil {
 		return err
 	}
 
-	// flag validation
+	// validation
 	if app.filterBreeds != "" {
-		app.validateBreed(app.filterBreeds)
+		return app.validateBreed(app.filterBreeds)
 	}
 
 	return nil
-
 }
 
 type Cat struct {
@@ -85,47 +79,64 @@ type Breed struct {
 
 func (app *appEnv) run() error {
 
+	// loads env values from .env if .env is detected
+	err := godotenv.Load()
+	if err == nil {
+		app.printMsg("Loading .env file")
+	}
+
 	// Breeds help
 	if app.helpBreeds {
-		breeds := app.getBreeds()
+		breeds, err := app.getBreeds()
+		if err != nil {
+			return err
+		}
 		fmt.Printf("%v available cat breeds:\n\n", len(breeds))
 		pPrintBreeds(breeds)
 		return nil
 	}
 
 	// get cat image
-	catsJson := app.getCats()
-	cats := app.parseCats(catsJson)
+	var cats []Cat
+	if err := app.getCats(&cats); err != nil {
+		return err
+	}
 	catUrl := app.getImgUrl(cats)
-	app.saveImg(catUrl)
-	return nil
+	return app.saveImg(catUrl)
 }
 
 // VALIDATE
-func (app appEnv) validateBreed(breed string) {
+func (app appEnv) validateBreed(breed string) error {
 	if breed == "" {
 		fmt.Println("Please provide a breed id to filter by breed.")
 	}
-	breeds := app.getBreeds()
+	breeds, err := app.getBreeds()
+	if err != nil {
+		return err
+	}
 	var breedIds []string
 	for _, b := range breeds {
 		breedIds = append(breedIds, b.Id)
 	}
 	_, found := Find(breedIds, breed)
 	if !found {
-		fmt.Printf("'%v' is an invalid breed id. Try one of these:\n\n", breed)
+		errorMsg := fmt.Sprintf("'%v' is an invalid breed id. Try one of these:\n", breed)
+		fmt.Println(errorMsg)
 		pPrintBreeds(breeds)
-		os.Exit(1)
+		return errors.New("invalid breed id")
 	}
+	return nil
 }
 
 // HTTP REQUEST
-func (app *appEnv) getCats() []byte {
-	catApiUrl := "https://api.thecatapi.com/v1/images/search?size=full"
+func (app *appEnv) getCats(data interface{}) error {
+	catApiUrl := "https://api.thecatapi.com/v1/images/search"
 
 	// build URL
 	u, err := url.Parse(catApiUrl)
-	die(err)
+	if err != nil {
+		return err
+	}
 	q := u.Query()
 	q.Add("size", "full")
 	q.Add("mime_types", "jpg")
@@ -136,51 +147,52 @@ func (app *appEnv) getCats() []byte {
 
 	// build request
 	req, err := http.NewRequest("GET", u.String(), nil)
-	die(err)
+	if err != nil {
+		return err
+	}
 	apiKey := os.Getenv("API_KEY")
 	if apiKey != "" {
-		app.printMsg("Using API_KEY...")
+		app.printMsg("API_KEY env variable is set. Using API_KEY in request...")
 		req.Header.Set("x-api-key", apiKey)
 	}
 
 	// send request
-	app.printMsg("Fetching cat data from The Cat API...")
+	app.printMsg("Sending request for cat data to The Cat API...")
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	die(err)
-	app.printMsg("Got cat data")
-	body, err := io.ReadAll(resp.Body)
-	die(err)
-	return body
+	if err != nil {
+		return err
+	}
+	app.printMsg("Got API response")
+
+	// parse json
+	app.printMsg("Parsing JSON from response...")
+	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
+		return err
+	}
+	app.printMsg("JSON parsed")
+	return nil
 }
 
-func (app appEnv) getBreeds() []Breed {
+func (app appEnv) getBreeds() ([]Breed, error) {
 	app.printMsg("Getting breeds from The Cat API...")
+	var breeds []Breed
 	catApiUrl := "https://api.thecatapi.com/v1/breeds"
 	resp, err := http.Get(catApiUrl)
-	die(err)
+	if err != nil {
+		return nil, err
+	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
-	die(err)
-	var breeds []Breed
+	if err != nil {
+		return nil, err
+	}
 	err = json.Unmarshal(body, &breeds)
 	if err != nil {
 		fmt.Println("whoops:", err)
 	}
 	app.printMsg("Got breeds data")
-	return breeds
-}
-
-// PARSE
-func (app appEnv) parseCats(body []byte) []Cat {
-	app.printMsg("Parsing cat data...")
-	var cats []Cat
-	err := json.Unmarshal(body, &cats)
-	if err != nil {
-		fmt.Println("whoops:", err)
-	}
-	app.printMsg("Cat data parsed")
-	return cats
+	return breeds, nil
 }
 
 func (app appEnv) getImgUrl(cats []Cat) string {
@@ -190,24 +202,31 @@ func (app appEnv) getImgUrl(cats []Cat) string {
 	return catUrl
 }
 
+// FILE I/O
+func (app *appEnv) saveImg(srcUrl string) error {
+	resp, err := http.Get(srcUrl)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	file, err := os.Create(app.outputPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, resp.Body)
+	if err != nil {
+		return err
+	}
+	app.printMsg("Cat saved to: " + app.outputPath)
+	return nil
+}
+
 // DISPLAY
 func (app *appEnv) printMsg(msg string) {
 	if app.verboseMode {
 		fmt.Println(msg)
 	}
-}
-
-// FILE I/O
-func (app *appEnv) saveImg(srcUrl string) {
-	resp, err := http.Get(srcUrl)
-	die(err)
-	defer resp.Body.Close()
-
-	file, err := os.Create(app.outputPath)
-	die(err)
-	defer file.Close()
-
-	_, err = io.Copy(file, resp.Body)
-	die(err)
-	app.printMsg("Cat saved to: " + app.outputPath)
 }

@@ -6,12 +6,13 @@ import (
 	"testing"
 )
 
-var rawJsonCat string = `[{"breeds":[],"id":"aqt","url":"https://cdn2.thecatapi.com/images/aqt.jpg","width":749,"height":677}]`
-
 func TestParseCats(t *testing.T) {
 	var app appEnv
-	catsJson := []byte(rawJsonCat)
-	cats := app.parseCats(catsJson)
+
+	var cats []Cat
+	if err := app.getCats(&cats); err != nil {
+		t.Fatalf(err.Error())
+	}
 	catUrl := app.getImgUrl(cats)
 	want := regexp.MustCompile(`\.jpg$`)
 	fmt.Println("cat url", catUrl)
@@ -22,7 +23,10 @@ func TestParseCats(t *testing.T) {
 
 func TestGetBreeds(t *testing.T) {
 	var app appEnv
-	breeds := app.getBreeds()
+	breeds, err := app.getBreeds()
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 	fmt.Println(breeds)
 	if len(breeds) < 50 {
 		t.Fatalf(`getBreeds should return at least 50 breeds, not %v`, len(breeds))
