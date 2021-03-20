@@ -1,6 +1,8 @@
 # cats
 CLI tool that downloads a random cat jpeg from [The Cat API](https://thecatapi.com/), implemented in Go.
 
+Pull requests to fix bugs or add features are welcome :)
+
 ## Installation
 First install [Go](https://golang.org/doc/install).
 
