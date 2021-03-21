@@ -67,9 +67,13 @@ func (app *appEnv) fromArgs(args []string) error {
 	return nil
 }
 
+type BreedInfo struct {
+}
+
 type Cat struct {
-	Id  string `json:"id"`
-	Url string `json:"url"`
+	Id     string  `json:"id"`
+	Url    string  `json:"url"`
+	Breeds []Breed `json:"breeds"`
 }
 
 type Breed struct {
