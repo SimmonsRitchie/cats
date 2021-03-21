@@ -49,7 +49,7 @@ Return a random image of an Egyptian Mau and save to file 'meow.jpg':
 
 By default, cats fetches data from [The Cat API](https://thecatapi.com/) without an API key. The Cat API allows requesters to return a small amount of data without using one, which is all that this tool needs.
 
-However, heavy users of cats may encounter rate limiting without use of an API key. You can sign up for a key for free on the website of [The Cat API](https://thecatapi.com/). You can then provide it to cats as an environment variable before execution.
+However, heavy users of cats may encounter rate limiting without use of an API key. You can sign up for a free key on the website of [The Cat API](https://thecatapi.com/). You can then provide it to cats as an environment variable before execution.
 
 On Mac/linux, run the following command, replacing 'xxxx' with your key:
 
@@ -63,4 +63,10 @@ Or you can set it in an .env file in the same directory as the binary:
 API_KEY=xxxx
 ```
 
+## Tips
 
+A handy Bash one-liner to download five cats in parallel:
+
+`for i in {1..5}; do cats -o "cat$i.jpg" & done; wait`
+
+Hat tip: [Carl Johnson](https://blog.carlmjohnson.net/post/2020/go-cli-how-to-and-advice/)
