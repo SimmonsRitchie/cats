@@ -174,7 +174,8 @@ func (app *appEnv) getCats(data interface{}) error {
 	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
 		return err
 	}
-	app.printMsg("JSON parsed")
+	strData := fmt.Sprintf("%v", data)
+	app.printMsg("Parsed JSON: " + strData)
 	return nil
 }
 
