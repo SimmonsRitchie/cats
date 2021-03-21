@@ -40,7 +40,7 @@ func (app *appEnv) fromArgs(args []string) error {
 	// set flags
 	fl := flag.NewFlagSet("cats", flag.ContinueOnError)
 	fl.StringVar(
-		&app.outputPath, "o", "./cat.jpg", "Output path for cat image",
+		&app.outputPath, "o", "", "Output filename for cat image. If not provided, bytes piped to Stdout",
 	)
 	fl.BoolVar(
 		&app.verboseMode, "v", false, "Log runtime messages to stdout",
@@ -214,17 +214,23 @@ func (app *appEnv) saveImg(srcUrl string) error {
 	}
 	defer resp.Body.Close()
 
-	file, err := os.Create(app.outputPath)
-	if err != nil {
-		return err
+	file := os.Stdout
+	pathDisplay := "stdout"
+	if app.outputPath != "" {
+		file, err = os.Create(app.outputPath)
+		pathDisplay = app.outputPath
+		if err != nil {
+			return err
+		}
+		defer file.Close()
 	}
-	defer file.Close()
 
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
 		return err
 	}
-	app.printMsg("Cat saved to: " + app.outputPath)
+	app.printMsg("Cat saved to: " + pathDisplay)
+
 	return nil
 }
 

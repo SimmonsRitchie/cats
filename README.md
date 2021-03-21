@@ -12,7 +12,7 @@ Then, to install the binary to your current directory, run the following command
 
 ## Usage
 
-Return a random image, saved as 'cat.jpg':
+Return a random image as a byte stream to Stdout:
 
 `cats`
 
@@ -20,7 +20,7 @@ Return a random image of an American Bobtail:
 
 `cats -b abob`
 
-Return a random image of an Egyptian Mau saved to 'meow.jpg':
+Return a random image of an Egyptian Mau and save to file 'meow.jpg':
 
 `cats -b emau -o meow.jpg`
 
