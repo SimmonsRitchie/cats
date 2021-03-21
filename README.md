@@ -33,8 +33,8 @@ Return a random image of an Egyptian Mau and save to file 'meow.jpg':
   -breeds
         Provides an index of available cat breed IDs
   -o string
-        Output path for cat image (default "./cat.jpg")
-  -v    log runtime messages to stdout
+        Output filename for cat image. If not provided, bytes piped to Stdout
+  -v    Log runtime messages to stdout
 ```
 
 ## Example cats
