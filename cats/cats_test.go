@@ -6,12 +6,22 @@ import (
 	"testing"
 )
 
-func TestParseCats(t *testing.T) {
+func TestFetchJSON(t *testing.T) {
 	var app appEnv
 	var cats []Cat
-	if err := app.getCats(&cats); err != nil {
+	if err := app.fetchJSON("https://api.thecatapi.com/v1/images/search", &cats); err != nil {
+		fmt.Println(err)
+		t.Fatalf("FetchJSON should return JSON without error")
+	}
+}
+
+func TestParseCats(t *testing.T) {
+	var app appEnv
+	cats, err := app.getCats()
+	if err != nil {
 		t.Fatalf(err.Error())
 	}
+
 	catUrl := app.imgUrlFrom(cats)
 	want := regexp.MustCompile(`\.jpg$`)
 	fmt.Println("cat url", catUrl)
@@ -37,10 +47,11 @@ func TestFilterBreeds(t *testing.T) {
 	app := appEnv{
 		filterBreeds: assertFilterBreed,
 	}
-	var cats []Cat
-	if err := app.getCats(&cats); err != nil {
+	cats, err := app.getCats()
+	if err != nil {
 		t.Fatalf(err.Error())
 	}
+
 	t.Log("Decoded json from response:", cats)
 	breed := cats[0].Breeds[0]
 	if breed.Id != assertFilterBreed {

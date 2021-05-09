@@ -103,10 +103,12 @@ func (app *appEnv) run() error {
 	}
 
 	// get cat image
-	var cats []Cat
-	if err := app.getCats(&cats); err != nil {
+	cats, err := app.getCats()
+	if err != nil {
 		return err
 	}
+	strData := fmt.Sprintf("%v", cats)
+	app.printMsg(strData)
 	catUrl := app.imgUrlFrom(cats)
 	return app.saveImg(catUrl)
 }
@@ -135,25 +137,10 @@ func (app appEnv) validateBreed(breed string) error {
 	return nil
 }
 
-// HTTP REQUEST
-func (app *appEnv) getCats(data interface{}) error {
-	catApiUrl := "https://api.thecatapi.com/v1/images/search"
-
-	// build URL
-	u, err := url.Parse(catApiUrl)
-	if err != nil {
-		return err
-	}
-	q := u.Query()
-	q.Add("size", "full")
-	q.Add("mime_types", "jpg")
-	if app.filterBreeds != "" {
-		q.Add("breed_ids", app.filterBreeds)
-	}
-	u.RawQuery = q.Encode()
-
+// FETCH JSON
+func (app *appEnv) fetchJSON(url string, data interface{}) error {
 	// build request
-	req, err := http.NewRequest("GET", u.String(), nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
@@ -164,14 +151,18 @@ func (app *appEnv) getCats(data interface{}) error {
 	}
 
 	// send request
-	app.printMsg("Sending request for cat data to The Cat API...")
+	app.printMsg("Sending request for " + url)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}
-	app.printMsg("Got API response")
+	defer resp.Body.Close()
 
+	app.printMsg("Got API response")
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("got unexpected status: %d %s", resp.StatusCode, resp.Status)
+	}
 	// parse json
 	app.printMsg("Parsing JSON from response...")
 	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
@@ -182,22 +173,39 @@ func (app *appEnv) getCats(data interface{}) error {
 	return nil
 }
 
+// GET CATS
+func (app *appEnv) getCats() ([]Cat, error) {
+	// build URL
+	catApiUrl := "https://api.thecatapi.com/v1/images/search"
+	u, err := url.Parse(catApiUrl)
+	if err != nil {
+		return nil, err
+	}
+	q := u.Query()
+	q.Add("size", "full")
+	q.Add("mime_types", "jpg")
+	if app.filterBreeds != "" {
+		q.Add("breed_ids", app.filterBreeds)
+	}
+	u.RawQuery = q.Encode()
+	var cats []Cat
+	err2 := app.fetchJSON(u.String(), &cats)
+	if err2 != nil {
+		return nil, err2
+	}
+	strData := fmt.Sprintf("%v", &cats)
+	app.printMsg("Parsed JSON 2: " + strData)
+	return cats, nil
+}
+
+// GET BREEDS
 func (app appEnv) getBreeds() ([]Breed, error) {
 	app.printMsg("Getting breeds from The Cat API...")
 	var breeds []Breed
 	catApiUrl := "https://api.thecatapi.com/v1/breeds"
-	resp, err := http.Get(catApiUrl)
+	err := app.fetchJSON(catApiUrl, &breeds)
 	if err != nil {
 		return nil, err
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(body, &breeds)
-	if err != nil {
-		fmt.Println("whoops:", err)
 	}
 	app.printMsg("Got breeds data")
 	return breeds, nil
