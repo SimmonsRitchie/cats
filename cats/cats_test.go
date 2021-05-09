@@ -12,7 +12,7 @@ func TestParseCats(t *testing.T) {
 	if err := app.getCats(&cats); err != nil {
 		t.Fatalf(err.Error())
 	}
-	catUrl := app.getImgUrl(cats)
+	catUrl := app.imgUrlFrom(cats)
 	want := regexp.MustCompile(`\.jpg$`)
 	fmt.Println("cat url", catUrl)
 	if !want.MatchString(catUrl) {

@@ -105,7 +105,7 @@ func (app *appEnv) run() error {
 	if err := app.getCats(&cats); err != nil {
 		return err
 	}
-	catUrl := app.getImgUrl(cats)
+	catUrl := app.imgUrlFrom(cats)
 	return app.saveImg(catUrl)
 }
 
@@ -200,7 +200,7 @@ func (app appEnv) getBreeds() ([]Breed, error) {
 	return breeds, nil
 }
 
-func (app appEnv) getImgUrl(cats []Cat) string {
+func (app appEnv) imgUrlFrom(cats []Cat) string {
 	cat := cats[0]
 	catUrl := cat.Url
 	app.printMsg("Got cat img url: " + catUrl)
