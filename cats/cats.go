@@ -67,7 +67,9 @@ func (app *appEnv) fromArgs(args []string) error {
 
 	// validation
 	if app.filterBreeds != "" {
-		return app.validateBreed(app.filterBreeds)
+		if err := app.validateBreed(app.filterBreeds); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -112,7 +114,7 @@ func (app *appEnv) run() error {
 // VALIDATE
 func (app appEnv) validateBreed(breed string) error {
 	if breed == "" {
-		fmt.Println("Please provide a breed id to filter by breed.")
+		fmt.Println("Please provide a breed id.")
 		return errors.New("empty breed id")
 	}
 	breeds, err := app.getBreeds()
