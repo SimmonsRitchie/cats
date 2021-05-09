@@ -37,6 +37,12 @@ func CLI(args []string) int {
 
 func (app *appEnv) fromArgs(args []string) error {
 
+	// loads env values from .env if .env is detected
+	err := godotenv.Load()
+	if err == nil {
+		app.printMsg("Loading .env file")
+	}
+
 	// set flags
 	fl := flag.NewFlagSet("cats", flag.ContinueOnError)
 	fl.StringVar(
@@ -82,12 +88,6 @@ type Breed struct {
 }
 
 func (app *appEnv) run() error {
-
-	// loads env values from .env if .env is detected
-	err := godotenv.Load()
-	if err == nil {
-		app.printMsg("Loading .env file")
-	}
 
 	// Breeds help
 	if app.helpBreeds {
