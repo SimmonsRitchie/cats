@@ -33,9 +33,9 @@ func TestGetBreeds(t *testing.T) {
 }
 
 func TestFilterBreeds(t *testing.T) {
-	filterBreed := "abob"
+	assertFilterBreed := "abob"
 	app := appEnv{
-		filterBreeds: filterBreed,
+		filterBreeds: assertFilterBreed,
 	}
 	var cats []Cat
 	if err := app.getCats(&cats); err != nil {
@@ -43,7 +43,26 @@ func TestFilterBreeds(t *testing.T) {
 	}
 	t.Log("Decoded json from response:", cats)
 	breed := cats[0].Breeds[0]
-	if breed.Id != "abob" {
-		t.Fatalf(`Returned cat breed ID should be '%v', not '%v'`, filterBreed, breed.Id)
+	if breed.Id != assertFilterBreed {
+		t.Fatalf(`Returned cat breed ID should be '%v', not '%v'`, assertFilterBreed, breed.Id)
 	}
+}
+
+func TestValidateBreed(t *testing.T) {
+	var app appEnv
+
+	// empty string returns error
+	assertFilterBreed := ""
+	err := app.validateBreed(assertFilterBreed)
+	if err == nil {
+		t.Fatalf(`Breed value of empty string should have returned error`)
+	}
+
+	// empty string returns error
+	assertFilterBreed2 := "abobo"
+	err2 := app.validateBreed(assertFilterBreed2)
+	if err2 == nil {
+		t.Fatalf(`Breed ID of '%v' should return an error because it's invalid`, assertFilterBreed2)
+	}
+
 }
