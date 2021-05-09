@@ -113,6 +113,7 @@ func (app *appEnv) run() error {
 func (app appEnv) validateBreed(breed string) error {
 	if breed == "" {
 		fmt.Println("Please provide a breed id to filter by breed.")
+		return errors.New("empty breed id")
 	}
 	breeds, err := app.getBreeds()
 	if err != nil {
